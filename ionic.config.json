@@ -1,0 +1,7 @@
+{
+  "name": "book-karo",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
