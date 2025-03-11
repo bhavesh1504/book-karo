@@ -1,13 +1,10 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>offer-bookings</ion-title>
+    <ion-title>{{ bookingOffers.title }}</ion-title>
+      <ion-back-button slot="start" defaultHref="/places/tabs/offers"></ion-back-button>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">offer-bookings</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <ion-button class="ion-margin" color="primary" [routerLink]="['/places/tabs/offers/edit', bookingOffers.id]"  >Edit</ion-button>
 </ion-content>
