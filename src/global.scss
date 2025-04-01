@@ -35,3 +35,11 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import "@ionic/angular/css/palettes/dark.system.css";
+
+.has-focus.ion-valid.sc-ion-input-md-h {
+    --highlight-color: #4d8dff;
+}
+
+.ion-valid.sc-ion-input-md-h {
+    --highlight-color: #4d8dff;
+}

@@ -7,10 +7,29 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">bookings</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content>
+  <ion-grid>
+    <ion-row>
+      <ion-col size-md="6" offset-md="3">
+        <ion-list>
+          <ion-item-sliding *ngFor="let booking of _loadedBookings" #slidingBookings>
+            <ion-item>
+              <ion-thumbnail slot="start">
+                <ion-img [src]="booking.imageUrl"></ion-img>
+              </ion-thumbnail>
+              <ion-label>
+                <h5>{{ booking.placetitle }}</h5>
+                <p>Guests: {{ booking.guestNumber }}</p>
+              </ion-label>
+            </ion-item>
+            <ion-item-options>
+              <ion-item-option color="danger" (click)="editBookings(booking.placeId,slidingBookings)">
+                <ion-icon slot="icon-only" name="trash"></ion-icon>
+              </ion-item-option>
+            </ion-item-options>
+          </ion-item-sliding>
+        </ion-list>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>

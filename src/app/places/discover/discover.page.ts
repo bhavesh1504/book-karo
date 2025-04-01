@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { PlacesService } from '../places.service';
 import { Place } from '../places.model';
-import { MenuController } from '@ionic/angular';
+import { MenuController, SegmentChangeEventDetail } from '@ionic/angular';
 
 @Component({
   selector: 'app-discover',
@@ -21,6 +21,10 @@ export class DiscoverPage implements OnInit {
 
   openSideMenu () {
     this.menuCtrl.toggle();
+  }
+
+  onChangeUpdate(event: CustomEvent<SegmentChangeEventDetail>) {
+    console.log(event.detail);
   }
 
 }
