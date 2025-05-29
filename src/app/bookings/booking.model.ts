@@ -5,6 +5,6 @@ export class Bookings {
      public userId: string,
      public placetitle: string,
      public imageUrl: string,
-     public guestNumber: number   
+     public guestNumber: number  
     ){}
 }

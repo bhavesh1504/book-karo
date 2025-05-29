@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActionSheetController, ModalController, NavController } from '@ionic/angular';
 import { PlacesService } from '../../places.service';
 import { Place } from '../../places.model';
 import { ActivatedRoute } from '@angular/router';
 import { CreateBookingComponent } from '../../../bookings/create-booking/create-booking.component';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-place-detail',
@@ -11,9 +12,10 @@ import { CreateBookingComponent } from '../../../bookings/create-booking/create-
   styleUrls: ['./place-detail.page.scss'],
   standalone: false
 })
-export class PlaceDetailPage implements OnInit {
+export class PlaceDetailPage implements OnInit, OnDestroy {
 
-  placeDetails!: Place
+  placeDetails!: Place;
+  private destroySub!: Subscription;
 
   constructor(private placesService: PlacesService, private navCtrl: NavController, private activateRoute: ActivatedRoute, private modalCtrl: ModalController, private actionSheetCtrl: ActionSheetController) { }
 
@@ -24,7 +26,9 @@ export class PlaceDetailPage implements OnInit {
         return;
       }
       const placeId:any = paramMap.get('placeId');
-      this.placeDetails = this.placesService.getPlaces(placeId) as Place;
+      this.destroySub = this.placesService.getPlaces(placeId).subscribe(places => {
+        this.placeDetails = places;
+      })
     })
 
   }
@@ -48,7 +52,7 @@ export class PlaceDetailPage implements OnInit {
 
   onBookingModal(mode: 'select' | 'random') {
     console.log('mode:', mode);
-    this.modalCtrl.create({ component:CreateBookingComponent, componentProps: { selectedPlace: this.placeDetails } }).then(modEl => {
+    this.modalCtrl.create({ component:CreateBookingComponent, componentProps: { selectedPlace: this.placeDetails, selectedMode: mode } }).then(modEl => {
       modEl.present();
       return modEl.onDidDismiss();
     }).then(resultData => {
@@ -57,6 +61,12 @@ export class PlaceDetailPage implements OnInit {
         console.log('BOOKED!');
       }
     })
+  }
+
+  ngOnDestroy(): void {
+    if(this.destroySub) {
+      this.destroySub.unsubscribe();
+    }
   }
 
 }

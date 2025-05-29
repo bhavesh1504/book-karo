@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { PlacesService } from '../../places.service';
+import { Router } from '@angular/router';
+import { LoadingController } from '@ionic/angular';
 
 @Component({
   selector: 'app-new-offer',
@@ -11,7 +14,7 @@ export class NewOfferPage implements OnInit {
 
   newOfferPageForm!: FormGroup;
 
-  constructor(private _formBuilder: FormBuilder) { }
+  constructor(private _formBuilder: FormBuilder, private _placeService: PlacesService, private _router: Router, private loadingCtrl: LoadingController) { }
 
   ngOnInit() {
 
@@ -31,7 +34,20 @@ export class NewOfferPage implements OnInit {
       this.newOfferPageForm.controls['price'].valid,
       this.newOfferPageForm.controls['fromDate'].valid,
       this.newOfferPageForm.controls['toDate'].valid, this.newOfferPageForm)
-      // this.newOfferPageForm.controls['title'].valid
+    this.newOfferPageForm.controls['title'].valid
+    if(!this.newOfferPageForm.valid) {
+      return
+    }
+    this.loadingCtrl.create({
+      message: 'Creating offer.....'
+    }).then(loadingEl => {
+      loadingEl.present();
+      this._placeService.addPlaces(this.newOfferPageForm.controls['title'].value, this.newOfferPageForm.controls['description'].value, +this.newOfferPageForm.controls['price'].value, new Date(this.newOfferPageForm.controls['fromDate'].value), new Date(this.newOfferPageForm.controls['toDate'].value)).subscribe(() => {
+        loadingEl.dismiss();
+        this.newOfferPageForm.reset();
+    this._router.navigate(['/places/tabs/offers']); 
+      })
+    }); 
   }
 
 }

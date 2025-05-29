@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Place } from '../../places.model';
-import { ActivatedRoute } from '@angular/router';
-import { NavController } from '@ionic/angular';
+import { ActivatedRoute, Router } from '@angular/router';
+import { LoadingController, NavController } from '@ionic/angular';
 import { PlacesService } from '../../places.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-edit-offer',
@@ -11,12 +12,13 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
   styleUrls: ['./edit-offer.page.scss'],
   standalone: false
 })
-export class EditOfferPage implements OnInit {
+export class EditOfferPage implements OnInit, OnDestroy {
 
   editOffers!: Place;
-  editOfferPageForm!: FormGroup
+  editOfferPageForm!: FormGroup;
+  private destroySub!: Subscription;
 
-  constructor(private placesService: PlacesService, private navCtrl: NavController, private activateRoute: ActivatedRoute, private _formBuilder: FormBuilder) { }
+  constructor(private placesService: PlacesService, private navCtrl: NavController, private activateRoute: ActivatedRoute, private _formBuilder: FormBuilder, private loadingCtrl: LoadingController, private _router: Router) { }
 
   ngOnInit() {
      this.activateRoute.paramMap.subscribe(paramMap => {
@@ -25,7 +27,10 @@ export class EditOfferPage implements OnInit {
         return;
       }
       const placeId:any = paramMap.get('placeId');
-      this.editOffers = this.placesService.getPlaces(placeId) as Place;
+      // this.editOffers = this.placesService.getPlaces(placeId) as Place;
+      this.destroySub = this.placesService.getPlaces(placeId).subscribe(places => {
+        this.editOffers = places;
+      });
       this.editOfferPageForm = this._formBuilder.group ({
         title: [this.editOffers.title, Validators.compose([Validators.required, Validators.maxLength(50)])],
         description: [this.editOffers.description, Validators.compose([Validators.required, Validators.maxLength(180)])],
@@ -39,6 +44,24 @@ export class EditOfferPage implements OnInit {
     }
     else {
       console.log('editOfferForm >> ', this.editOfferPageForm);
+      this.loadingCtrl.create({
+        message: 'Editing offer.....'
+      }).then(loadingEl => {
+        loadingEl.present();
+        this.placesService.updatePlaces(this.editOffers.id, this.editOfferPageForm.controls['title'].value, this.editOfferPageForm.controls['description'].value).subscribe(() => {
+          loadingEl.dismiss();
+          this.editOfferPageForm.reset();
+      this._router.navigate(['/places/tabs/offers']); 
+        });
+  } 
+
+    )}
+
+  }
+
+  ngOnDestroy(): void {
+    if(this.destroySub) {
+      this.destroySub.unsubscribe();
     }
   }
 
